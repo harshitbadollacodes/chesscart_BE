@@ -29,7 +29,7 @@ app.use("/user", userRouter);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: "Refer to the API docs at github.com/"
+    message: "Refer to the API docs at https://github.com/harshitbadollacodes/chesscart_BE"
   });
 });
 
