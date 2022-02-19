@@ -2,106 +2,19 @@ const express = require("express");
 const router = express.Router();
 const { Address } = require("../models/address.model");
 
-router.route("/")
-.get(async (req, res) => {
-  try {
-    const { userId } = req;
-    const address = await Address.find({ userId });
+const { 
+  getAddress, 
+  addNewAddress, 
+  deleteAddress, 
+  editAddress 
+} = require("../controller/address/address.controller");
 
-    if(address === null) {
-      return res.json({
-        success: true,
-        address: []
-      })
-    }
-    
-    res.json({
-      success: true,
-      address
-    });
+router.route("/").get(getAddress);
 
-  } catch(error) {
-    console.log(error);
-    res.status(500).json({success: false, message: "cannot get address", errorMessage: error.message});
-  }
-})
+router.route("/new").post(addNewAddress);
 
-router.route("/new")
-.post(async (req, res) => {
-  try {
-    const { userId } = req;
-    const { fullName, flatNo, streetName, city, state, pincode } = req.body;
-    
-    const newAddress = new Address({      
-      userId,
-      fullName, 
-      flatNo,
-      streetName,
-      city, 
-      state, 
-      pincode
-    });
-    const saveAddress = await newAddress.save();
+router.route("/:addressId").delete(deleteAddress);
 
-    res.json({
-      success: true,
-      saveAddress
-    });
-
-  } catch(error) {
-    console.log(error);
-    res.status(400).json({
-      success: false, message: "Error occured", errorMessage: error.message
-    })
-  }
-});
-
-router.route("/:addressId")
-.delete(async (req, res) => {
-  try {
-    const { addressId } = req.params;
-    const address = await Address.findById(addressId);
-    
-    address.remove();
-
-    res.json({ success: true });
-  } catch(error) {
-    console.log(error);
-    res.status(409).json({
-      success: false,
-      message: "cannot complete request",
-      errorMessage: error.message
-    })
-  }
-});
-
-router.route("/edit/:addressId")
-.post(async (req, res) => {
-  try {
-    const { addressId } = req.params;
-    const {fullName, flatNo, streetName, city, state, pincode, } = req.body;
-
-    const address = await Address.findById(addressId);
-  
-    address.fullName = fullName;
-    address.flatNo = flatNo;
-    address.streetName = streetName;
-    address.city = city;
-    address.state = state;
-    address.pincode = pincode;
-
-    const updatedAddress = await address.save();
-
-    res.json({ success: true, updatedAddress });
-
-  } catch(error) {
-    console.log(error);
-    res.status(409).json({
-      success: false,
-      message: "cannot complete request",
-      errorMessage: error.message
-    })
-  }
-})
+router.route("/edit/:addressId").post(editAddress)
 
 module.exports = router;
